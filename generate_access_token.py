@@ -5,14 +5,17 @@ import os
 
 URL = "https://auth.eagleeyenetworks.com/oauth2/token"
 
+# Function to get the absolute file path
 def get_filepath(filename):
     script_directory = os.path.dirname(os.path.abspath(__file__))
     return os.path.join(script_directory, filename)
 
+# Function to write JSON data to a file
 def write_json(filename, data):
     with open(get_filepath(filename), 'w') as f:
         json.dump(data, f, indent=4)
 
+# Function to make a POST request
 def make_request(url, headers, data):
     try:
         response = requests.post(url, headers=headers, data=data)
@@ -24,6 +27,8 @@ def make_request(url, headers, data):
             print(f"Status Code: {response.status_code}, Reason: {response.reason}")
         raise
 
+# Function to get the required data from the user
+## keep in mind that the clientId and clientSecret should be base64 encoded: clientId:clientSecret ##
 def get_required_data():
     required_data = {}
     required_keys = ['refresh_token','cc_base64']
