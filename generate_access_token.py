@@ -1,27 +1,13 @@
-import os
 import json
 import requests
 from urllib.parse import quote
+import os
 
 URL = "https://auth.eagleeyenetworks.com/oauth2/token"
-
-def get_required_data():
-    required_data = {}
-    
-    required_data['refresh_token'] = input("Enter your refresh token: ")
-    required_data['scope'] = 'vms.all'
-    required_data['token_type'] = 'Bearer'
-    required_data['cc_base64'] = input("Enter your clientId:clientSecret base64 encoded: ")
-    
-    return required_data
 
 def get_filepath(filename):
     script_directory = os.path.dirname(os.path.abspath(__file__))
     return os.path.join(script_directory, filename)
-
-def read_json(filename):
-    with open(get_filepath(filename), 'r') as f:
-        return json.load(f)
 
 def write_json(filename, data):
     with open(get_filepath(filename), 'w') as f:
@@ -38,6 +24,18 @@ def make_request(url, headers, data):
             print(f"Status Code: {response.status_code}, Reason: {response.reason}")
         raise
 
+def get_required_data():
+    required_data = {}
+    required_keys = ['refresh_token','cc_base64']
+
+    for key in required_keys:
+        required_data[key] = input(f"Enter the value for {key}: ")
+
+    if not all(required_data.values()):
+        raise ValueError("All required data was not provided")
+
+    return required_data
+
 def main():
     required_data = get_required_data()
 
@@ -52,19 +50,8 @@ def main():
     }
 
     new_access_data = make_request(URL, headers, data)
-    write_json('access_token.json', new_access_data["access_token"])
-
-    print(f"Request URL: {URL}\n")
-    print("Headers:")
-    print(json.dumps(headers, indent=4))
-    print("Data:")
-    print(json.dumps(data, indent=4))
-    print("\nSuccessfully updated access token.\n")
-    print(f"Access_token: {new_access_data['access_token']}\n")
-
-def clear_terminal():
-    os.system('cls' if os.name == 'nt' else 'clear')
+    write_json('access_response.json', new_access_data)
+    print("New access token and refresh token written to access_response.json")
 
 if __name__ == "__main__":
-    clear_terminal()
     main()
